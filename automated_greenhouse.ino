@@ -27,11 +27,8 @@ Servo servoMotor;
 OneWire oneWirePin(TEMP_SENSOR);            
 DallasTemperature sensors(&oneWirePin);
 
-// Setting up sensor
-//OneWire outsideWirePin(OUTSIDE_TEMP_SENSOR);            
-//DallasTemperature outside_sensors(&outsideWirePin);
-
-int ventsOpen;
+//global for tracking whether the vents or open or not.
+boolean ventsOpen;
 
 float inside = 0;
 float outside = 0;
@@ -69,7 +66,6 @@ void setup() {
     
     // Beginning temperature sensor 
     sensors.begin();      
-    //outside_sensors.begin();
 
     ventsOpen = false;
 }
@@ -79,13 +75,12 @@ void loop() {
     sensors.requestTemperatures();
     inside = sensors.toFahrenheit(sensors.getTempCByIndex(0));
     
-    //outside_sensors.requestTemperatures();
     outside = sensors.toFahrenheit(sensors.getTempCByIndex(1));
 
     Serial.print("outside: "); Serial.print(outside); Serial.print("\n");
     Serial.print("inside: "); Serial.print(inside); Serial.print("\n");
 
-    if(inside < LOW_BOUNDS_TEMP) {
+    if (inside < LOW_BOUNDS_TEMP) {
         if (ventsOpen == true) {
             closeServo();
             closeStepper();
@@ -93,7 +88,7 @@ void loop() {
         }
 
         handleHeating();
-    } else if(inside > HIGH_BOUNDS_TEMP) {
+    } else if (inside > HIGH_BOUNDS_TEMP) {
         if (ventsOpen == false) {
             openServo();
             openStepper();
@@ -107,7 +102,6 @@ void loop() {
             closeStepper();
             ventsOpen = false;
         }
-        
     }
    
    delay(500);
@@ -145,14 +139,13 @@ void handleCooling() {
 
     delay(60000);
 
-    digitalWrite(RELAY_FAN, HIGH);  //off
+    digitalWrite(RELAY_FAN, HIGH);
     delay(10);
-    digitalWrite(RELAY_HEATER, LOW);   //off
+    digitalWrite(RELAY_HEATER, LOW);
 }
 
 /** Opens the greenhouse vent if it isn't already open */
 void openServo() {
-    delay(5);
     if(servoMotor.read() != SERVO_OPEN_VAL) {
         servoMotor.write(SERVO_OPEN_VAL);
     }
@@ -160,7 +153,6 @@ void openServo() {
 
 /** Closes the greenhouse vent if it isn't already closed */
 void closeServo() {
-    delay(5);
     if(servoMotor.read() != SERVO_CLOSED_VAL) {
         servoMotor.write(SERVO_CLOSED_VAL);
     }
@@ -172,7 +164,6 @@ void closeServo() {
  *    then puts the stepper motor back in sleep mode
  */
 void openStepper() {
-    delay(10);
     // Awake
     digitalWrite(STEPPER_SLEEP, HIGH); 
     delay(5);
@@ -183,7 +174,7 @@ void openStepper() {
     // 30 seconds
     uint32_t period = .5 * 60000L;       
 
-    for( uint32_t tStart = millis();  (millis()-tStart) < period;  ){
+    for(uint32_t tStart = millis();  (millis()-tStart) < period;  ){
         digitalWrite(STEPPER_DIRECTION, HIGH);
         digitalWrite(STEPPER_STEPS, HIGH);
         delay(SPEED_OF_STEPPER);
@@ -201,8 +192,6 @@ void openStepper() {
  *    then puts the stepper motor back in sleep mode
  */
 void closeStepper() {
-    delay(10);
-
     // Awake
     digitalWrite(STEPPER_SLEEP, HIGH);
     delay(5);
@@ -213,7 +202,7 @@ void closeStepper() {
     // 30 seconds
     uint32_t period = .5 * 60000L;       
 
-    for( uint32_t tStart = millis();  (millis()-tStart) < period;  ){
+    for(uint32_t tStart = millis();  (millis()-tStart) < period;  ){
         digitalWrite(STEPPER_DIRECTION, LOW);
         digitalWrite(STEPPER_STEPS, HIGH);
         delay(SPEED_OF_STEPPER);

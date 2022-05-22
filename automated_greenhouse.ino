@@ -87,7 +87,12 @@ void loop() {
             ventsOpen = false;
         }
 
-        handleHeating();
+        digitalWrite(RELAY_FAN, HIGH);  //off
+        delay(10);
+        digitalWrite(RELAY_HEATER, HIGH);   //on
+
+        delay(60000);
+        
     } else if (inside > HIGH_BOUNDS_TEMP) {
         if (ventsOpen == false) {
             openServo();
@@ -95,7 +100,12 @@ void loop() {
             ventsOpen = true;
         }
 
-        handleCooling();
+        digitalWrite(RELAY_HEATER, LOW);   //off
+        delay(10);
+        digitalWrite(RELAY_FAN, LOW);  //on
+
+        delay(60000);
+        
     } else {
         if (outside <= LOW_BOUNDS_TEMP && ventsOpen == true) {
             closeServo();
@@ -105,43 +115,6 @@ void loop() {
     }
    
    delay(500);
-}
-
-/**
- *  Turns on the heater for one minute to heat the greenhouse
- *  Makes sure the vent is closed, and the cooling fans are off
- */
-void handleHeating() {
-    delay(10);
-    
-    digitalWrite(RELAY_HEATER, HIGH);   //on
-    delay(10);
-    digitalWrite(RELAY_FAN, HIGH);  //off
-
-    delay(60000);
-    
-    digitalWrite(RELAY_HEATER, LOW);   //off
-    delay(10);
-    digitalWrite(RELAY_FAN, HIGH);  //off
-}
-
-/**
- * Opens the vents and turns on the cooling fans for one minute,
- *    then turns off the fans and closes the vents
- * Makes sure heater is off
- */
-void handleCooling() {
-    delay(10);
-
-    digitalWrite(RELAY_FAN, LOW);  //on
-    delay(10);
-    digitalWrite(RELAY_HEATER, LOW);   //off
-
-    delay(60000);
-
-    digitalWrite(RELAY_FAN, HIGH);
-    delay(10);
-    digitalWrite(RELAY_HEATER, LOW);
 }
 
 /** Opens the greenhouse vent if it isn't already open */
